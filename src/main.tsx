@@ -5,6 +5,7 @@ import { advance, defaultConfig, initialRun, pause, reset, resume, type Config, 
 import { Story } from './Story'
 import { Diagram } from './Diagram'
 import { sddFlows, sddLinks, sddNodes } from './narrative-data'
+import { Presentation } from './Presentation'
 import './style.css'
 
 const sectionNames: Record<(typeof guided)[number], string> = {
@@ -68,7 +69,6 @@ function App() {
   const [mode, setMode] = useState<'guided' | 'free'>('guided')
   const [progress, setProgress] = useState<string[]>(initialProgress)
   const [glossary, setGlossary] = useState(false)
-  const [presentation, setPresentation] = useState(false)
   const [comparison, setComparison] = useState<'isolated' | 'system'>('isolated')
   const [selectedId, setSelectedId] = useState('prompt')
   const [demonstration, setDemonstration] = useState(0)
@@ -147,7 +147,7 @@ function App() {
   }
 
   return (
-    <div className={presentation ? 'app presentation' : 'app'}>
+    <div className="app">
       <a href="#main" className="skip">Saltar al contenido</a>
       <header className="header">
         <a href="#inicio" className="brand" onClick={() => visit('inicio')} aria-label="Ir al inicio">P<span className="brand-mark">/</span>S <span className="brand-caption">LABORATORIO</span></a>
@@ -160,7 +160,7 @@ function App() {
         </nav>
         <div className="header-actions">
           <button className="text-button" onClick={() => setGlossary(v => !v)} aria-expanded={glossary} aria-controls="glossary-panel">Glosario</button>
-          <button className="mode-button" onClick={() => setPresentation(v => !v)} aria-pressed={presentation}>{presentation ? 'Salir de presentación' : 'Presentar'}</button>
+          <a className="mode-button" href="?presentacion=1#inicio" target="_blank" rel="noopener noreferrer" aria-label="Abrir Diapositiva highlights en una pestaña nueva">Diapositiva highlights ↗</a>
         </div>
       </header>
       {glossary && <aside id="glossary-panel" className="glossary" aria-label="Glosario de conceptos">
@@ -277,4 +277,6 @@ function App() {
   )
 }
 
-createRoot(document.getElementById('root')!).render(<App />)
+createRoot(document.getElementById('root')!).render(
+  new URLSearchParams(window.location.search).get('presentacion') === '1' ? <Presentation /> : <App />,
+)

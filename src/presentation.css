@@ -1,0 +1,227 @@
+.presentation-deck {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  height: 100dvh;
+  min-height: 320px;
+  overflow: hidden;
+  background: #e9eee1;
+  color: #192b20;
+}
+
+.presentation-bar {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 4px;
+  padding: 12px clamp(20px, 4vw, 64px);
+  background: #193b2b;
+  color: #f7f9f0;
+  font-size: 13px;
+}
+.presentation-bar a { width: fit-content; color: #e5efd9; font-weight: 700; }
+
+.presentation-screen {
+  min-width: 0;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-color: #68856d #e9eee1;
+}
+.slide-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  align-content: start;
+  gap: 8px;
+  width: min(100%, 880px);
+  margin: 0 auto;
+  padding: 18px clamp(22px, 4vw, 60px) 12px;
+}
+.slide-position {
+  margin: 0;
+  color: #3c6347;
+  font-size: 13px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+.slide-grid h1 {
+  margin: 0;
+  max-width: 18ch;
+  font-size: clamp(44px, 4.3vw, 62px);
+  line-height: 1.04;
+  letter-spacing: -.03em;
+}
+.slide-grid h1:focus { outline: none; }
+.slide-idea {
+  margin: 0;
+  max-width: 28ch;
+  font-size: clamp(23px, 2.6vw, 36px);
+  font-weight: 650;
+  line-height: 1.25;
+  letter-spacing: -.02em;
+  color: #315d40;
+}
+.slide-detail {
+  max-width: 65ch;
+  margin: 0;
+  color: #3b5141;
+  font-size: clamp(16px, 1.5vw, 21px);
+  line-height: 1.5;
+}
+.slide-activity {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 12px;
+  min-width: 0;
+  margin-top: 0;
+  padding-top: 12px;
+  border-top: 1px solid #aebfaf;
+}
+.slide-options {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 6px;
+}
+.slide-choice {
+  min-height: 44px;
+  width: 100%;
+  padding: 9px 17px;
+  border: 1px solid #6d9176;
+  border-radius: 6px;
+  background: #f9faf4;
+  color: #204731;
+  font-weight: 750;
+  text-align: left;
+}
+.slide-choice:hover:not(:disabled), .slide-choice[aria-pressed="true"] { background: #dbeacf; }
+.slide-label { font-size: 14px; font-weight: 750; }
+.slide-activity select { max-width: 100%; }
+.slide-result {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 6px;
+  min-width: 0;
+  padding: clamp(18px, 3vw, 28px);
+  border-radius: 9px;
+  background: #fffefa;
+}
+.slide-result strong { font-size: clamp(22px, 2.5vw, 32px); line-height: 1.2; }
+.slide-result p { margin: 0; font-size: clamp(17px, 1.7vw, 23px); line-height: 1.45; }
+.slide-result span { color: #476451; font-size: 14px; line-height: 1.45; }
+.slide-result a { color: #245c39; font-size: 17px; font-weight: 700; }
+.slide-points {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 8px;
+  margin: 8px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.slide-points li {
+  padding: 6px 0;
+  border-top: 1px solid #b9c9b7;
+  color: #294532;
+  font-size: clamp(15px, 1.35vw, 19px);
+  line-height: 1.35;
+}
+.slide-diagram {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 8px;
+  min-width: 0;
+  margin-top: 4px;
+  padding-top: 10px;
+  border-top: 1px solid #aebfaf;
+}
+.diagram-track {
+  display: flex;
+  gap: 6px;
+  min-width: 0;
+  margin: 0;
+  padding: 0 0 6px;
+  list-style: none;
+  overflow-x: auto;
+  scrollbar-color: #68856d #e9eee1;
+}
+.diagram-track li {
+  display: grid;
+  align-content: center;
+  gap: 4px;
+  flex: 1 0 105px;
+  min-height: 54px;
+  padding: 8px;
+  border: 1px solid #aac0ad;
+  border-radius: 5px;
+  background: #f7f8f0;
+  color: #34553d;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+.diagram-track li.is-complete { background: #dcebd8; }
+.diagram-track li.is-current { background: #214632; border-color: #214632; color: white; }
+.diagram-index { font-size: 11px; font-variant-numeric: tabular-nums; opacity: .8; }
+.diagram-readout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 6px;
+  min-height: 106px;
+  padding: 10px 20px;
+  border-radius: 8px;
+  background: #fffefa;
+}
+.diagram-readout strong { font-size: clamp(20px, 2vw, 27px); }
+.diagram-readout p { margin: 0; font-size: clamp(16px, 1.45vw, 19px); line-height: 1.35; }
+.diagram-readout span { color: #476451; font-size: 12px; }
+.diagram-actions {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 6px;
+}
+.diagram-actions button, .diagram-mode {
+  min-height: 44px;
+  padding: 8px;
+  border: 1px solid #6d9176;
+  border-radius: 5px;
+  background: #fffefa;
+  color: #204731;
+  font-weight: 700;
+}
+.diagram-mode { background: #dcebd8; }
+.diagram-actions button:hover:not(:disabled), .diagram-mode:hover { background: #dcebd8; }
+.slide-exit { display: inline-block; width: fit-content; margin-top: 18px; color: #245c39; font-size: 18px; font-weight: 700; }
+.presentation-deck button:focus-visible, .presentation-deck a:focus-visible { outline: 3px solid #ae652d; outline-offset: 3px; }
+.presentation-deck button:disabled { opacity: .55; cursor: not-allowed; }
+
+.presentation-controls {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 6px;
+  padding: 10px clamp(20px, 4vw, 64px);
+  border-top: 1px solid #bfd0bf;
+  background: #f5f3ec;
+}
+.presentation-controls button {
+  min-height: 44px;
+  border: 1px solid #778f7c;
+  border-radius: 5px;
+  background: #fffefa;
+  color: #214632;
+  font-size: 14px;
+  font-weight: 750;
+}
+.presentation-controls .slide-next { background: #214632; color: #fffefa; }
+.presentation-controls button:hover:not(:disabled) { filter: brightness(.92); }
+
+@media (max-width: 580px) {
+  .slide-grid { gap: 13px; padding-top: 24px; }
+  .slide-grid h1 { font-size: clamp(37px, 10vw, 56px); }
+  .slide-idea { font-size: clamp(21px, 6vw, 28px); }
+  .slide-detail { font-size: 16px; }
+  .diagram-actions { grid-template-columns: minmax(0, 1fr); }
+  .diagram-readout { min-height: 155px; }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .diagram-track li { transition: background-color .25s ease-out, color .25s ease-out; }
+  .diagram-readout { animation: diagram-enter .35s ease-out; }
+}
+@keyframes diagram-enter { from { opacity: .65; transform: translateY(5px); } to { opacity: 1; transform: none; } }
