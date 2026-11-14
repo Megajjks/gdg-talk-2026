@@ -26,7 +26,7 @@ T1 [S1-S3,S7,S9-S11] inline — verified; atlas in 1359537, guided narrative in 
 T2 [S4,S8] inline — verified; engine 03dd00e, browser lab in 1359537; npm test 7/7, npm run build, npm run test:browser.
 T3 [S5-S8,S14-S15] inline — verified; map in 1359537, harness and SDD diagrams in 26f8d73.
 T4 [S12-S13] inline — verified; memory/compaction, MCP and agent evolution chapters in 26f8d73.
-T5 [S9-S17] inline — verified locally; reading-page regeneration, branching ODD diagram, selectable harness journeys and browser checks; commit pending.
+T5 [S9-S17] inline — verified locally; reading-page regeneration, branching ODD diagram, selectable harness journeys and browser checks; commit cfac47f.
 
 ## Log
 L1. El usuario solicitó implementar una web educativa completa para “Del prompt al sistema: cómo construir workflows con IA”, guardada en una carpeta nueva con el nombre de su charla; incluye recorrido, atlas interactivo, simulador de tres escenarios, mapa, SDD/ODD, accesibilidad, responsive y despliegue estático. El mensaje original completo permanece en la conversación; las frases literales de aceptación están citadas arriba.
