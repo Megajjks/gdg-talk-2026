@@ -192,9 +192,14 @@ export const concepts: Concept[] = [
   },
 ]
 
-export const guided = ['inicio', 'atlas', 'laboratorio', 'mapa', 'aplicacion'] as const
+export const guided = ['inicio', 'origen', 'contexto', 'memoria', 'capacidades', 'harness', 'aplicacion'] as const
 
 export const sources = [
+  { label: 'OpenAI · guía de ingeniería de prompts', url: 'https://platform.openai.com/docs/guides/prompt-engineering' },
+  { label: 'Anthropic · ingeniería de contexto para agentes', url: 'https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents' },
+  { label: 'Claude Code · instrucciones y memoria', url: 'https://code.claude.com/docs/en/memory' },
+  { label: 'Engram · documentación del servidor de memoria', url: 'https://github.com/Gentleman-Programming/engram/blob/main/README.md' },
+  { label: 'Anthropic · agentes y workflows', url: 'https://www.anthropic.com/research/building-effective-agents' },
   { label: 'Model Context Protocol · arquitectura oficial', url: 'https://modelcontextprotocol.io/docs/learn/architecture' },
   { label: 'GitHub Spec Kit · repositorio y flujo', url: 'https://github.com/github/spec-kit' },
   { label: 'Joaquín Ruiz · Qué es el ODD y en qué se diferencia del SDD (06/11/2026)', url: 'https://jokiruiz.com/inteligencia-artificial/que-es-odd-organic-driven-development/' },

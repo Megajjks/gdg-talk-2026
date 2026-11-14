@@ -2,12 +2,17 @@ import React, { useEffect, useState } from 'react'
 import { createRoot } from 'react-dom/client'
 import { concepts, familyNames, guided, sources, type Family } from './content'
 import { advance, defaultConfig, initialRun, pause, reset, resume, type Config, type Run, type Scenario } from './simulation'
+import { Story } from './Story'
+import { Diagram } from './Diagram'
+import { sddFlows, sddLinks, sddNodes } from './narrative-data'
 import './style.css'
 
 const sectionNames: Record<(typeof guided)[number], string> = {
-  inicio: 'Punto de partida', atlas: 'Atlas de conceptos', laboratorio: 'Laboratorio',
-  mapa: 'Mapa del sistema', aplicacion: 'SDD y ODD',
+  inicio: 'Punto de partida', origen: 'El prompt', contexto: 'Contexto',
+  memoria: 'Memoria', capacidades: 'Herramientas y agentes',
+  harness: 'Harness', aplicacion: 'Metodologías',
 }
+const freeNames = { atlas: 'Atlas de conceptos', laboratorio: 'Laboratorio', mapa: 'Mapa del sistema', aplicacion: 'SDD y ODD' } as const
 const scenarioNames: Record<Scenario, string> = {
   success: 'El formulario cumple los criterios',
   failure: 'Una prueba falla y se corrige',
@@ -147,7 +152,8 @@ function App() {
       <header className="header">
         <a href="#inicio" className="brand" onClick={() => visit('inicio')} aria-label="Ir al inicio">P<span className="brand-mark">/</span>S <span className="brand-caption">LABORATORIO</span></a>
         <nav aria-label="Navegación principal" className="nav">
-          <a href="#atlas" onClick={() => visit('atlas')}>Atlas</a>
+            <a href="#origen" onClick={() => visit('origen')}>Recorrido</a>
+            <a href="#atlas" onClick={() => visit('atlas')}>Atlas</a>
           <a href="#laboratorio" onClick={() => visit('laboratorio')}>Simular</a>
           <a href="#mapa" onClick={() => visit('mapa')}>Mapa</a>
           <a href="#aplicacion" onClick={() => visit('aplicacion')}>Aplicar</a>
@@ -168,7 +174,7 @@ function App() {
             <p className="section-intro">Una charla de 30 minutos · Un caso, muchas piezas</p>
             <h1>Del prompt <span>al sistema.</span></h1>
             <p className="hero-lede">Cómo construir workflows con IA. Un laboratorio para ver qué pasa entre pedir un formulario y recibir un resultado comprobado.</p>
-            <button className="primary" onClick={() => visit('atlas')}>Explorar el sistema <span aria-hidden="true">↗</span></button>
+            <button className="primary" onClick={() => visit('origen')}>Comenzar la charla <span aria-hidden="true">↗</span></button>
             <p className="small-note">Sin cuentas, sin claves y sin IA conectada. Las demostraciones son simuladas y predefinidas.</p>
           </div>
           <div className="hero-demo" aria-label="Comparación interactiva de una petición y un proceso">
@@ -187,16 +193,28 @@ function App() {
         </section>
 
         <section className="route-strip" aria-label="Formas de explorar">
-          <div><strong>Tu recorrido, a tu ritmo.</strong><p>Seguí la secuencia de la charla o salta directamente a lo que querés entender.</p></div>
+          <div><strong>Tu recorrido, a tu ritmo.</strong><p>Seguí la secuencia de la charla o saltá directamente a lo que querés entender.</p></div>
           <div className="segmented route-choice" role="group" aria-label="Modo de navegación">
             <button className={mode === 'guided' ? 'selected' : ''} onClick={() => setMode('guided')} aria-pressed={mode === 'guided'}>Recorrido guiado</button>
             <button className={mode === 'free' ? 'selected' : ''} onClick={() => setMode('free')} aria-pressed={mode === 'free'}>Exploración libre</button>
           </div>
           {mode === 'guided' ? <div className="route-steps">{guided.map((id, i) => <a key={id} href={`#${id}`} onClick={() => visit(id)} aria-label={`${sectionNames[id]}${progress.includes(id) ? ', visitado' : ''}`}><span>{String(i + 1).padStart(2, '0')}</span>{sectionNames[id]} {progress.includes(id) && <span aria-hidden="true">✓</span>}</a>)}</div> :
-            <div className="route-steps">{(['atlas', 'laboratorio', 'mapa', 'aplicacion'] as const).map(id => <a key={id} href={`#${id}`} onClick={() => visit(id)}>{sectionNames[id]} <span aria-hidden="true">↗</span></a>)}</div>}
+            <div className="route-steps">{(['atlas', 'laboratorio', 'mapa', 'aplicacion'] as const).map(id => <a key={id} href={`#${id}`} onClick={() => visit(id)}>{freeNames[id]} <span aria-hidden="true">↗</span></a>)}</div>}
           <small>Progreso guardado solo en este navegador. {progress.length} de {guided.length} etapas visitadas.</small>
         </section>
 
+        <Story onVisit={visit} />
+        <section id="aplicacion" className="section application-section">
+          <div className="section-heading"><div><span className="small-caps">ÚLTIMO CAPÍTULO · 5 MIN</span><h2>Sin metodología, <em>el sistema pierde rumbo.</em></h2><p>El harness ofrece capacidades y límites; un método decide cómo plantear, ejecutar y verificar el trabajo. Ninguno reemplaza el criterio humano.</p></div></div>
+          <Diagram label="SDD: de requisito a verificación" className="sdd-diagram" nodes={sddNodes} links={sddLinks} flows={sddFlows} />
+          <p className="chapter-caveat">Este flujo SDD es una ilustración para una feature; no exige a todas las plataformas ni a todo cambio pasar por los mismos archivos.</p>
+          <div className="approaches">
+            <article className="approach"><span className="approach-type">SDD · EJEMPLO ILUSTRATIVO</span><h3>La especificación como eje</h3><p>Una forma de Spec-Driven Development: convertir el pedido en un contrato verificable antes de implementar.</p><ol className="artifact-list"><li><b>Requerimiento</b><span>Pedido del formulario con API y validaciones.</span><small>Artefacto: necesidad expresada.</small></li><li><b>Especificación</b><span>Campos, errores visibles, respuestas esperadas.</span><small>Artefacto: criterios comprobables.</small></li><li><b>Planificación</b><span>Componentes, integración y pruebas por realizar.</span><small>Artefacto: plan de trabajo.</small></li><li><b>Implementación</b><span>El agente usa contexto y herramientas permitidas.</span><small>Artefacto: cambios de código.</small></li><li><b>Verificación</b><span>Pruebas y revisión frente a criterios.</span><small>Artefacto: evidencia y pendientes.</small></li></ol></article>
+            <article className="approach"><span className="approach-type">ODD · SEGÚN JOAQUÍN RUIZ</span><h3>El proceso se ajusta al trabajo</h3><p>Según <a href="https://jokiruiz.com/inteligencia-artificial/que-es-odd-organic-driven-development/" target="_blank" rel="noreferrer">el artículo de Joaquín Ruiz</a>, ODD es el flujo de <i>gentle-ai</i>: entender el código, clasificar si la tarea es pequeña o grande e implementar con pruebas.</p><div className="odd-steps"><div><b>Entender</b><span>Leer el proyecto y consultar solo decisiones de producto abiertas.</span></div><div><b>Clasificar</b><span>Pequeña: resolver directamente. Grande: documentar requisitos en <code>odd/tasks</code> y conservarlos en Engram, según esa implementación.</span></div><div><b>Implementar y probar</b><span>Comprobar el resultado; una capa de revisión separada puede añadir control.</span></div></div><p className="source-note"><b>Adaptación didáctica de esta web:</b> usamos el formulario de registro para mostrar esas decisiones. No afirmamos que todas las variantes de ODD usen el mismo software ni que esta simulación ejecute gentle-ai.</p></article>
+          </div>
+          <div className="comparison-table"><h3>¿Qué cambia en la práctica?</h3><div className="table-scroll"><table><thead><tr><th>Aspecto</th><th>SDD ilustrado aquí</th><th>ODD descrito por la fuente</th></tr></thead><tbody><tr><th>Especificación</th><td>Se explicita antes del código como artefacto central.</td><td>Una tarea pequeña puede resolverse sin documento; una grande conserva requisitos en una tarea.</td></tr><tr><th>Iteración</th><td>La implementación sigue un plan, que puede revisarse.</td><td>La cantidad de proceso cambia al clasificar el trabajo.</td></tr><tr><th>Validación</th><td>Pruebas y revisión frente a la especificación.</td><td>Implementación con pruebas; el artículo distingue una revisión de riesgos aparte.</td></tr></tbody></table></div><p>No hay un enfoque universalmente superior. La complejidad, el riesgo y la necesidad de dejar decisiones por escrito importan.</p></div>
+        </section>
+        <div className="free-intro"><span>PARA EXPLORAR A TU RITMO</span><h2>Ahora, <em>probá las piezas.</em></h2><p>El atlas, el laboratorio y el mapa complementan la charla: no sustituyen su hilo narrativo.</p></div>
         <section id="atlas" className="section atlas-section">
           <div className="section-heading"><div><h2>Las piezas, <em>en acción.</em></h2><p>Elegí un concepto. Probá una variante. Observá qué cambia en el mismo formulario de registro.</p></div><span className="count-label">14 CONCEPTOS · 4 FAMILIAS</span></div>
           <div className="atlas-layout">
@@ -253,14 +271,6 @@ function App() {
           <div className="map-answer"><h3>De la petición al resultado validado</h3><p>El usuario define un objetivo. El workflow ordena etapas; el harness gestiona un agente que consulta al modelo y usa información y herramientas permitidas. Las pruebas devuelven evidencia; el agente corrige o se detiene, y una persona decide donde corresponde. El resultado comunica qué se verificó y qué no.</p></div>
         </section>
 
-        <section id="aplicacion" className="section application-section">
-          <div className="section-heading"><div><h2>Del mapa <em>al trabajo real.</em></h2><p>Los mismos componentes pueden organizarse con enfoques diferentes. Ninguno reemplaza el criterio humano ni la verificación.</p></div></div>
-          <div className="approaches">
-            <article className="approach"><span className="approach-type">SDD · EJEMPLO ILUSTRATIVO</span><h3>La especificación como eje</h3><p>Una forma de Spec-Driven Development: convertir el pedido en un contrato verificable antes de implementar.</p><ol className="artifact-list"><li><b>Requerimiento</b><span>Pedido del formulario con API y validaciones.</span><small>Artefacto: necesidad expresada.</small></li><li><b>Especificación</b><span>Campos, errores visibles, respuestas esperadas.</span><small>Artefacto: criterios comprobables.</small></li><li><b>Planificación</b><span>Componentes, integración y pruebas por realizar.</span><small>Artefacto: plan de trabajo.</small></li><li><b>Implementación</b><span>El agente usa contexto y herramientas permitidas.</span><small>Artefacto: cambios de código.</small></li><li><b>Verificación</b><span>Pruebas y revisión frente a criterios.</span><small>Artefacto: evidencia y pendientes.</small></li></ol></article>
-            <article className="approach"><span className="approach-type">ODD · SEGÚN JOAQUÍN RUIZ</span><h3>El proceso se ajusta al trabajo</h3><p>Según <a href={sources[2].url} target="_blank" rel="noreferrer">el artículo de Joaquín Ruiz</a>, ODD es el flujo de <i>gentle-ai</i>: entender el código, clasificar si la tarea es pequeña o grande e implementar con pruebas.</p><div className="odd-steps"><div><b>Entender</b><span>Leer el proyecto y consultar solo decisiones de producto abiertas.</span></div><div><b>Clasificar</b><span>Pequeña: resolver directamente. Grande: documentar requisitos en <code>odd/tasks</code> y conservarlos en Engram, según esa implementación.</span></div><div><b>Implementar y probar</b><span>Comprobar el resultado; una capa de revisión separada puede añadir control.</span></div></div><p className="source-note"><b>Adaptación didáctica de esta web:</b> usamos el formulario de registro para mostrar esas decisiones. No afirmamos que todas las variantes de ODD usen el mismo software ni que esta simulación ejecute gentle-ai.</p></article>
-          </div>
-          <div className="comparison-table"><h3>¿Qué cambia en la práctica?</h3><div className="table-scroll"><table><thead><tr><th>Aspecto</th><th>SDD ilustrado aquí</th><th>ODD descrito por la fuente</th></tr></thead><tbody><tr><th>Especificación</th><td>Se explicita antes del código como artefacto central.</td><td>Una tarea pequeña puede resolverse sin documento; una grande conserva requisitos en una tarea.</td></tr><tr><th>Iteración</th><td>La implementación sigue un plan, que puede revisarse.</td><td>La cantidad de proceso cambia al clasificar el trabajo.</td></tr><tr><th>Validación</th><td>Pruebas y revisión frente a la especificación.</td><td>Implementación con pruebas; el artículo distingue una revisión de riesgos aparte.</td></tr></tbody></table></div><p>No hay un enfoque universalmente superior. La complejidad, el riesgo y la necesidad de dejar decisiones por escrito importan.</p></div>
-        </section>
       </main>
       <footer><div><strong>Del prompt al sistema.</strong><p>Un laboratorio para mirar el proceso, no solo la respuesta.</p><small>Todas las interacciones del atlas, mapa y laboratorio son simuladas y predefinidas. Los detalles de skills, hooks, permisos y harness dependen de la plataforma.</small></div><div><h2>Fuentes y lectura</h2><ul>{sources.map(s => <li key={s.url}><a href={s.url} target="_blank" rel="noreferrer">{s.label} ↗</a></li>)}</ul></div><a href="#inicio" onClick={() => visit('inicio')}>Volver arriba ↑</a></footer>
     </div>

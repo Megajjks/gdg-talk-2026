@@ -2,6 +2,8 @@
 
 Laboratorio interactivo para la charla **“Del prompt al sistema: cómo construir workflows con IA”**. Sitio estático en React, TypeScript y Vite. Todas las demostraciones y las trazas son simuladas y predefinidas; no se contacta ningún servicio de IA ni se requieren cuentas o claves.
 
+El **recorrido guiado** sigue el hilo de la charla: primeros prompts → instrucciones y contexto del proyecto → límite de contexto, compactación y trazabilidad → MCP, loop, skills, subagentes y hooks → harness → metodologías SDD y ODD. El **atlas, laboratorio y mapa** quedan disponibles para explorar libremente. Los diagramas del harness y SDD permiten elegir un escenario, avanzar o animar cada etapa, inspeccionar nodos y leer el recorrido como lista. La secuencia es didáctica, no una cronología histórica ni una receta universal.
+
 ## Iniciar
 
 Requiere Node.js 22 o superior y npm:
@@ -35,6 +37,8 @@ Subí **el contenido de `dist/`** a un hosting estático (por ejemplo, GitHub Pa
 - `src/simulation.ts`: estados, transiciones y trazas predefinidas; no contiene llamadas reales a herramientas.
 - `src/simulation.test.ts`: escenarios de éxito, fallo/corrección, aclaración y controles de salida.
 - `src/main.tsx`: recorrido, atlas, simulador, mapa y enfoques de trabajo.
+- `src/Story.tsx` y `src/narrative-data.ts`: capítulos del guion, ejemplos y datos de los diagramas.
+- `src/Diagram.tsx`: reproductor accesible de flujos de harness y SDD, sin llamadas externas.
 - `src/style.css`: sistema visual, responsive y movimiento reducido.
 
 La sección ODD se basa en el artículo de Joaquín Ruiz enlazado en la web; su uso del formulario es una **adaptación didáctica**, no una etapa nueva del enfoque. Los hooks, skills, permisos y funciones del harness dependen de la plataforma.
