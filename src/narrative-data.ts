@@ -82,6 +82,22 @@ export const harnessFlows: DiagramFlow[] = [
     { from: 'agente', to: 'tools', title: 'Se solicita la consulta', input: 'Leer la documentación de API.', output: 'El entorno decide si autoriza la invocación.', why: 'La conexión y el permiso son controles distintos.' },
     { from: 'tools', to: 'agente', title: 'Vuelve una observación', input: 'Respuesta de herramienta.', output: 'Contrato API incorporado al contexto actual.', why: 'El agente puede continuar o solicitar intervención.' },
   ] },
+  { id: 'odd', title: 'Harness + ODD', steps: [
+    { from: 'usuario', to: 'harness', title: 'Autorizar y explorar en solo lectura', input: 'Pedido del formulario y permisos de la sesión.', output: 'Archivos y criterios leídos antes de modificar.', why: 'En este ejemplo de ODD se distingue investigar de editar: una petición de análisis no autoriza cambios.' },
+    { from: 'harness', to: 'agente', title: 'Clasificar tamaño y riesgo', input: 'Mapa del repositorio y requisitos.', output: 'Ruta pequeña o grande, con comprobaciones proporcionales.', why: 'La clasificación organiza el trabajo; no equivale a que el modelo tenga acceso ilimitado.' },
+    { from: 'agente', to: 'subagentes', title: 'Delegar solo si hace falta', input: 'Unidad acotada con criterios y permisos.', output: 'Resumen y evidencia devueltos al agente principal.', why: 'En ODD de gentle-ai, la delegación responde a desencadenantes concretos; no toda tarea grande la necesita.' },
+    { from: 'agente', to: 'tools', title: 'Implementar con controles', input: 'Instrucciones, contrato de API y alcance autorizado.', output: 'Código y pruebas del formulario (simulados).', why: 'Permisos y hooks del entorno pueden controlar acciones sensibles.' },
+    { from: 'tools', to: 'pruebas', title: 'Comprobar antes de cerrar', input: 'Cambio y criterios observables.', output: 'Resultado de pruebas y pendientes.', why: 'Un fallo vuelve al ciclo; no se llama validado a un cambio sin evidencia.' },
+    { from: 'pruebas', to: 'harness', title: 'Persistir estado y cerrar', input: 'Resultados y decisiones relevantes.', output: 'Tarea en Markdown o memoria externa cuando aplica; resumen para retomar.', why: 'El estado duradero reduce pérdidas tras la compactación, pero no sustituye comprobar la fuente.' },
+  ] },
+  { id: 'sdd', title: 'Harness + SDD', steps: [
+    { from: 'usuario', to: 'harness', title: 'Recibir el requisito', input: 'Pedido del formulario y criterios iniciales.', output: 'Objetivo disponible para documentar.', why: 'El entorno conserva la solicitud y limita qué herramientas se pueden usar.' },
+    { from: 'harness', to: 'agente', title: 'Documentar spec.md', input: 'Alcance, errores esperados y restricciones.', output: 'Especificación comprobable (simulada).', why: 'Este pipeline SDD ilustrativo explicita qué se debe construir antes de editar.' },
+    { from: 'agente', to: 'tools', title: 'Crear plan.md y tasks.md', input: 'Especificación y arquitectura existente.', output: 'Plan y tareas trazables (simulados).', why: 'La documentación ordena la implementación, aunque consume trabajo y contexto.' },
+    { from: 'tools', to: 'hooks', title: 'Ejecutar una tarea bajo controles', input: 'Tarea concreta y permisos.', output: 'Edición simulada; hook de formato opcional.', why: 'Un hook es un mecanismo de plataforma, no una garantía universal.' },
+    { from: 'tools', to: 'pruebas', title: 'Verificar contra la especificación', input: 'Formulario, contrato y criterios.', output: 'Pruebas y diferencias con la spec (simuladas).', why: 'Si falla, se corrige el código o se revisan los artefactos con trazabilidad.' },
+    { from: 'pruebas', to: 'harness', title: 'Guardar avance y entregar evidencia', input: 'Resultado y tareas pendientes.', output: 'Estado recuperable y respuesta para la persona.', why: 'La persistencia del estado es una decisión de implementación, no una capacidad intrínseca del modelo.' },
+  ] },
 ]
 
 export const sddNodes: DiagramNode[] = [
@@ -116,5 +132,39 @@ export const sddFlows: DiagramFlow[] = [
     { from: 'plan', to: 'tareas', title: 'Se ajusta la tarea', input: 'Plan corregido.', output: 'Validación de email reabierta.', why: 'Se conserva la trazabilidad de la decisión.' },
     { from: 'tareas', to: 'codigo', title: 'Se corrige', input: 'Regla explícita.', output: 'Código corregido (simulado).', why: 'La corrección todavía requiere pruebas.' },
     { from: 'codigo', to: 'verificacion', title: 'Se comprueba de nuevo', input: 'Prueba de email y API.', output: 'Resultados observables actualizados.', why: 'Se cierra solo cuando los criterios comprobados pasan.' },
+  ] },
+]
+
+export const oddNodes: DiagramNode[] = [
+  { id: 'pedido', title: 'Pedido', x: 105, y: 255, role: 'user', detail: 'Primero se determina si se pidió investigar o implementar; no se edita con un pedido de análisis.' },
+  { id: 'explorar', title: 'Explorar', x: 300, y: 255, role: 'data', detail: 'Leer los requisitos y el código existente antes de elegir una ruta.' },
+  { id: 'clasificar', title: 'Clasificar', x: 500, y: 255, role: 'system', detail: 'Evaluar lo entendido, el riesgo y si hace falta conservar un seguimiento durable.' },
+  { id: 'pequena', title: 'Ruta pequeña', x: 735, y: 125, role: 'agent', detail: 'Implementar directamente, comprobar el resultado y no crear tareas duraderas innecesarias.' },
+  { id: 'grande', title: 'Ruta grande', x: 735, y: 385, role: 'data', detail: 'Crear odd/tasks/tarea.md; guardar criterios y avance antes de implementar por unidades.' },
+  { id: 'verificar', title: 'Verificar', x: 930, y: 255, role: 'control', detail: 'Probar criterios observables y comunicar lo pendiente; los riesgos pueden requerir revisión adicional.' },
+]
+
+export const oddLinks: DiagramLink[] = [
+  { from: 'pedido', to: 'explorar', label: 'autoriza lectura' },
+  { from: 'explorar', to: 'clasificar', label: 'aporta evidencia' },
+  { from: 'clasificar', to: 'pequena', label: 'si es pequeña' },
+  { from: 'clasificar', to: 'grande', label: 'si necesita seguimiento' },
+  { from: 'pequena', to: 'verificar', label: 'comprueba' },
+  { from: 'grande', to: 'verificar', label: 'implementa y comprueba' },
+  { from: 'verificar', to: 'grande', label: 'registra pendientes' },
+]
+
+export const oddFlows: DiagramFlow[] = [
+  { id: 'pequena', title: 'Ruta pequeña', steps: [
+    { from: 'pedido', to: 'explorar', title: 'Leer en solo lectura', input: 'Formulario y criterios del usuario.', output: 'Componentes y contrato conocidos.', why: 'Conocer el código precede a modificarlo.' },
+    { from: 'explorar', to: 'clasificar', title: 'Clasificar la tarea pequeña', input: 'Alcance entendido y riesgo acotado.', output: 'Ruta directa sin documento adicional.', why: 'La tarea se puede retomar desde el pedido y el diff.' },
+    { from: 'clasificar', to: 'pequena', title: 'Implementar directamente', input: 'Criterio y prueba esperada.', output: 'Cambio pequeño con prueba (simulado).', why: 'No hace falta crear tareas ni delegar por defecto.' },
+    { from: 'pequena', to: 'verificar', title: 'Comprobar y entregar', input: 'Código y criterio.', output: 'Prueba observada y límite comunicado.', why: 'Cerrar exige evidencia, no solo una respuesta convincente.' },
+  ] },
+  { id: 'grande', title: 'Ruta grande', steps: [
+    { from: 'pedido', to: 'explorar', title: 'Leer en solo lectura', input: 'Formulario y restricciones.', output: 'Mapa del código y dudas pendientes.', why: 'Una decisión de producto abierta se consulta antes de escribir.' },
+    { from: 'explorar', to: 'clasificar', title: 'Clasificar la tarea grande', input: 'Trabajo que necesita continuidad.', output: 'Ruta con seguimiento durable.', why: 'El tamaño real determina la ceremonia, no el número de archivos.' },
+    { from: 'clasificar', to: 'grande', title: 'Guardar odd/tasks/tarea.md', input: 'Requisitos y resultados esperados.', output: 'Tareas, decisiones y avance persistidos.', why: 'El documento permite retomar después de una compactación.' },
+    { from: 'grande', to: 'verificar', title: 'Implementar por unidades y verificar', input: 'Unidad concreta con prueba y alcance.', output: 'Cambio, prueba y pendientes registrados.', why: 'Un subagente o revisión adicional se activa cuando existe una razón concreta.' },
   ] },
 ]
