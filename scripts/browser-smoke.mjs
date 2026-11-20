@@ -229,8 +229,12 @@ try {
     const overflow = await evaluate('document.querySelector(".presentation-screen").scrollHeight - document.querySelector(".presentation-screen").clientHeight')
     if (overflow > 0) slideOverflows.push(`${id}: ${overflow}px`)
     if (id === 'harness') {
+      assert.equal(await evaluate('document.querySelectorAll(".diagram-scene .diagram-node").length'), 6)
+      assert.equal(await evaluate('document.querySelectorAll(".diagram-scene .diagram-link.is-active").length'), 0)
+      assert.match(await evaluate('document.querySelector(".diagram-scene").getAttribute("aria-label")'), /harness/i)
       assert.match(await evaluate('document.querySelector(".diagram-readout").innerText'), /contexto/i)
       await click('document.querySelector(".diagram-next")')
+      assert.equal(await evaluate('document.querySelectorAll(".diagram-scene .diagram-link.is-active").length'), 1)
       assert.match(await evaluate('document.querySelector(".diagram-readout").innerText'), /modelo/i)
       for (let i = 0; i < 4; i++) await click('document.querySelector(".diagram-next")')
       assert.match(await evaluate('document.querySelector(".diagram-readout").innerText'), /observación/i)
@@ -243,6 +247,18 @@ try {
     if (id === 'sdd' || id === 'odd') {
       await click('document.querySelector(".diagram-next")')
       assert.match(await evaluate('document.querySelector(".diagram-readout").innerText'), /spec|contexto|clasific/i)
+      await screenshot(`presentation-${id}-desktop`, 1440, 900)
+      if (id === 'odd') {
+        await click('document.querySelector(".diagram-next")')
+        assert.match(await evaluate('document.querySelector(".diagram-readout").innerText'), /ruta pequeña/i)
+        await click('document.querySelector(".diagram-next")')
+        assert.match(await evaluate('document.querySelector(".diagram-readout").innerText'), /verificar/i)
+        assert.equal(await evaluate('document.querySelector(".diagram-next").disabled'), true)
+        await click("document.querySelector('.diagram-route[data-route=\"large\"]')")
+        assert.match(await evaluate('document.querySelector(".diagram-readout").innerText'), /clasificar/i)
+        await click('document.querySelector(".diagram-next")')
+        assert.match(await evaluate('document.querySelector(".diagram-readout").innerText'), /ruta grande/i)
+      }
     }
     if (id === 'comparacion') {
       await click('document.querySelector(".diagram-mode")')
@@ -272,7 +288,14 @@ try {
   await evaluate('location.hash = "#harness"')
   await wait(80)
   await screenshot('presentation-harness-mobile', 390, 844)
+  assert.equal(await evaluate('document.querySelector(".diagram-scene").scrollWidth <= document.querySelector(".diagram-scene").clientWidth'), true, 'Diagram must fit the mobile viewport without hidden horizontal steps')
+  assert.equal(await evaluate("document.querySelector('.diagram-advance-mobile').closest('[aria-hidden=\"true\"]')"), null, 'The mobile action must remain available to assistive technology')
+  assert.equal(await evaluate('document.querySelector(".diagram-advance-mobile").getBoundingClientRect().bottom <= document.querySelector(".presentation-controls").getBoundingClientRect().top'), true, 'The diagram next-step action must be visible above slide navigation on mobile')
+  await click('document.querySelector(".diagram-advance-mobile")')
+  assert.match(await evaluate('document.querySelector(".diagram-readout").innerText'), /modelo/i)
   assert.equal(await evaluate('document.documentElement.scrollWidth <= window.innerWidth'), true)
+  await screenshot('presentation-harness-small-mobile', 320, 720)
+  assert.equal(await evaluate('document.querySelector(".diagram-scene").scrollWidth <= document.querySelector(".diagram-scene").clientWidth'), true)
   assert.deepEqual(errors, [], 'No console errors or uncaught exceptions')
   console.log('Browser controls and desktop/mobile responsive smoke checks passed.')
 } finally {

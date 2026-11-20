@@ -132,34 +132,45 @@
   padding-top: 10px;
   border-top: 1px solid #aebfaf;
 }
-.diagram-track {
-  display: flex;
-  gap: 6px;
+.slide-grid:has(.slide-diagram) h1 { font-size: clamp(42px, 3.8vw, 54px); }
+.slide-grid:has(.slide-diagram) .slide-idea { max-width: 38ch; font-size: clamp(22px, 2.2vw, 29px); }
+.slide-grid:has(.slide-diagram) .slide-detail { font-size: clamp(15px, 1.25vw, 18px); }
+.slide-grid:has(.diagram-top-controls) { gap: 6px; }
+.diagram-scene {
   min-width: 0;
-  margin: 0;
-  padding: 0 0 6px;
-  list-style: none;
-  overflow-x: auto;
-  scrollbar-color: #68856d #e9eee1;
+  padding: 3px 8px;
+  border: 1px solid #a9c1ad;
+  border-radius: 12px;
+  background: #f3f6ed;
 }
-.diagram-track li {
-  display: grid;
-  align-content: center;
-  gap: 4px;
-  flex: 1 0 105px;
-  min-height: 54px;
-  padding: 8px;
-  border: 1px solid #aac0ad;
-  border-radius: 5px;
-  background: #f7f8f0;
-  color: #34553d;
-  font-size: 13px;
-  font-weight: 700;
-  line-height: 1.2;
+.diagram-visual { display: block; width: 100%; height: auto; }
+.diagram-boundary rect { fill: #e4ede0; stroke: #8eae94; stroke-width: 2; }
+.diagram-link { fill: none; stroke: #78967c; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+.diagram-link.is-active { stroke: #ae542e; stroke-width: 4; }
+.diagram-feedback { fill: none; stroke: #5b7b63; stroke-width: 2; stroke-dasharray: 5 5; opacity: .75; }
+.diagram-node rect { fill: #fffefa; stroke: #9eb6a2; stroke-width: 2; }
+.diagram-node circle { fill: #e6eee3; }
+.diagram-node text { fill: #254331; font-family: system-ui, sans-serif; font-weight: 700; }
+.diagram-node .diagram-name { font-size: 14px; }
+.diagram-node .diagram-number { font-size: 11px; }
+.diagram-node.is-complete rect { fill: #d7e8d1; stroke: #568866; }
+.diagram-node.is-current rect { fill: #214632; stroke: #173d29; stroke-width: 3; }
+.diagram-node.is-current circle { fill: #c3e597; }
+.diagram-node.is-current text { fill: #fffefa; }
+.diagram-node.is-current .diagram-number { fill: #173d29; }
+.diagram-mobile { display: none; }
+.diagram-advance-mobile { display: none; }
+.diagram-steps-accessible {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }
-.diagram-track li.is-complete { background: #dcebd8; }
-.diagram-track li.is-current { background: #214632; border-color: #214632; color: white; }
-.diagram-index { font-size: 11px; font-variant-numeric: tabular-nums; opacity: .8; }
 .diagram-readout {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
@@ -177,7 +188,12 @@
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 6px;
 }
-.diagram-actions button, .diagram-mode {
+.diagram-top-controls {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 225px), 1fr));
+  gap: 6px;
+}
+.diagram-actions button, .diagram-mode, .diagram-route {
   min-height: 44px;
   padding: 8px;
   border: 1px solid #6d9176;
@@ -186,8 +202,8 @@
   color: #204731;
   font-weight: 700;
 }
-.diagram-mode { background: #dcebd8; }
-.diagram-actions button:hover:not(:disabled), .diagram-mode:hover { background: #dcebd8; }
+.diagram-mode, .diagram-route { background: #dcebd8; }
+.diagram-actions button:hover:not(:disabled), .diagram-mode:hover, .diagram-route:hover { background: #dcebd8; }
 .slide-exit { display: inline-block; width: fit-content; margin-top: 18px; color: #245c39; font-size: 18px; font-weight: 700; }
 .presentation-deck button:focus-visible, .presentation-deck a:focus-visible { outline: 3px solid #ae652d; outline-offset: 3px; }
 .presentation-deck button:disabled { opacity: .55; cursor: not-allowed; }
@@ -217,11 +233,57 @@
   .slide-grid h1 { font-size: clamp(37px, 10vw, 56px); }
   .slide-idea { font-size: clamp(21px, 6vw, 28px); }
   .slide-detail { font-size: 16px; }
-  .diagram-actions { grid-template-columns: minmax(0, 1fr); }
-  .diagram-readout { min-height: 155px; }
+  .slide-grid:has(.slide-diagram) h1 { font-size: 37px; }
+  .slide-grid:has(.slide-diagram) .slide-idea { font-size: 21px; }
+  .diagram-visual { display: none; }
+  .diagram-steps-accessible { display: none; }
+  .diagram-scene { padding: 10px; }
+  .diagram-mobile { display: grid; gap: 6px; }
+  .diagram-neighbor {
+    padding: 7px 12px;
+    border: 1px solid #a9c1ad;
+    border-radius: 5px;
+    color: #385840;
+    font-size: 13px;
+    font-weight: 700;
+  }
+  .diagram-mobile-current {
+    display: grid;
+    gap: 5px;
+    padding: 14px;
+    border-radius: 7px;
+    background: #214632;
+    color: white;
+  }
+  .diagram-mobile-current span { font-size: 12px; font-variant-numeric: tabular-nums; }
+  .diagram-mobile-current strong { font-size: 20px; line-height: 1.2; }
+  .diagram-mobile-current { position: relative; }
+  .diagram-mobile-current::after {
+    content: "";
+    position: absolute;
+    width: 2px;
+    height: 6px;
+    left: 50%;
+    bottom: -6px;
+    background: #487154;
+  }
+  .diagram-advance-mobile {
+    display: block;
+    min-height: 44px;
+    border: 0;
+    border-radius: 5px;
+    background: #214632;
+    color: #fffefa;
+    font-weight: 700;
+  }
+  .diagram-actions { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .diagram-actions .diagram-next { display: none; }
+  .diagram-top-controls { grid-template-columns: minmax(0, 1fr); }
+  .diagram-readout { min-height: 94px; }
+  .diagram-readout strong { display: none; }
 }
 @media (prefers-reduced-motion: no-preference) {
-  .diagram-track li { transition: background-color .25s ease-out, color .25s ease-out; }
-  .diagram-readout { animation: diagram-enter .35s ease-out; }
+  .diagram-node rect, .diagram-node circle, .diagram-node text, .diagram-link { transition: fill .24s ease-out, stroke .24s ease-out; }
+  .diagram-link.is-active { stroke-dasharray: 360; stroke-dashoffset: 0; animation: diagram-draw .4s ease-out; }
 }
-@keyframes diagram-enter { from { opacity: .65; transform: translateY(5px); } to { opacity: 1; transform: none; } }
+@keyframes diagram-draw { from { stroke-dashoffset: 360; } to { stroke-dashoffset: 0; } }

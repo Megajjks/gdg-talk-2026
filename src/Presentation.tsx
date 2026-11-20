@@ -185,50 +185,114 @@ const flows: Record<'context' | 'memory' | 'harness' | 'sdd' | 'odd', readonly S
   ],
 }
 
+const smallPath = [0, 1, 2, 5]
+const largePath = [0, 1, 3, 4, 5]
+const linearPaths: Record<Exclude<NonNullable<Slide['diagram']>, 'odd' | 'comparison'>, number[]> = {
+  context: [0, 1, 2, 3], memory: [0, 1, 2, 3, 4],
+  harness: [0, 1, 2, 3, 4, 5], sdd: [0, 1, 2, 3, 4, 5],
+}
+
+function DiagramScene({ selected, stages, step, path, onNext }: { selected: string; stages: readonly Step[]; step: number; path: readonly number[]; onNext: () => void }) {
+  const points = stages.map((_, i) => ({
+    x: selected === 'odd' ? [128, 380, 632, 128, 380, 632][i] : [128, 380, 632][i < 3 ? i : 5 - i],
+    y: i < 3 ? 44 : 125,
+  }))
+  const links = selected === 'odd'
+    ? [[0, 1], [1, 2], [1, 3], [2, 5], [3, 4], [4, 5]]
+    : stages.slice(0, -1).map((_, i) => [i, i + 1])
+  const position = path.indexOf(step)
+  const labels = (name: string) => {
+    if (name.length <= 17) return [name]
+    const words = name.split(' ')
+    const pivot = Math.ceil(words.length / 2)
+    return [words.slice(0, pivot).join(' '), words.slice(pivot).join(' ')]
+  }
+
+  return <div className="diagram-scene" role="group" aria-label={`Diagrama de ${selected}: ${stages.length} etapas conectadas`}>
+    <svg className="diagram-visual" viewBox="0 0 760 170" aria-hidden="true" focusable="false">
+      <defs>
+        <marker id="diagram-arrow" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto">
+          <path d="M 1 1 L 7 4 L 1 7 Z" fill="#78967c" />
+        </marker>
+      </defs>
+      {selected === 'harness' && <g className="diagram-boundary">
+        <rect x="2" y="3" width="756" height="164" rx="18" />
+      </g>}
+      {links.map(([source, target]) => {
+        const from = points[source]
+        const to = points[target]
+        const forward = to.x > from.x
+        const connector = selected === 'odd' && source === 1 && target === 3
+          ? `M ${from.x} ${from.y + 31} V 85 H ${to.x} V ${to.y - 37}`
+          : from.y === to.y
+          ? `M ${from.x + (forward ? 96 : -96)} ${from.y} L ${to.x + (forward ? -103 : 103)} ${to.y}`
+          : `M ${from.x} ${from.y + 31} L ${to.x} ${to.y - 37}`
+        const active = path.slice(0, position).some((fromStep, i) => fromStep === source && path[i + 1] === target)
+        return <path key={`${selected}-link-${source}-${target}`} className={`diagram-link${active ? ' is-active' : ''}`} d={connector} markerEnd="url(#diagram-arrow)" />
+      })}
+      {selected === 'harness' && <path className="diagram-feedback" d="M 129 156 C 52 164, 52 88, 128 80" />}
+      {points.map((point, i) => <g key={stages[i].name} className={`diagram-node${i === step ? ' is-current' : i < step ? ' is-complete' : ''}`} transform={`translate(${point.x}, ${point.y})`}>
+        <rect x="-94" y="-30" width="188" height="60" rx="10" />
+        <circle cx="-69" cy="-1" r="13" />
+        <text className="diagram-number" x="-69" y="3" textAnchor="middle">{i + 1}</text>
+        <text className="diagram-name" x="-47" y={labels(stages[i].name).length === 1 ? 5 : -4}>
+          {labels(stages[i].name).map((line, lineIndex) => <tspan x="-47" dy={lineIndex === 0 ? 0 : 16} key={line}>{line}</tspan>)}
+        </text>
+      </g>)}
+    </svg>
+    <div className="diagram-mobile">
+      {position > 0 && <div className="diagram-neighbor">Anterior · {stages[path[position - 1]].name}</div>}
+      <div className="diagram-mobile-current"><span>{String(position + 1).padStart(2, '0')} / {String(path.length).padStart(2, '0')}</span><strong>{stages[step].name}</strong></div>
+      {position < path.length - 1 && <div className="diagram-neighbor">Sigue · {stages[path[position + 1]].name}</div>}
+      <button className="diagram-advance-mobile" onClick={onNext} disabled={position === path.length - 1}>Siguiente paso del diagrama</button>
+    </div>
+    <ol className="diagram-steps-accessible">
+      {stages.map((stage, i) => <li key={stage.name} aria-current={i === step ? 'step' : undefined}>{stage.name}</li>)}
+    </ol>
+  </div>
+}
+
 function Diagram({ kind }: { kind: NonNullable<Slide['diagram']> }) {
   const [step, setStep] = useState(0)
   const [mode, setMode] = useState<'odd' | 'sdd'>('odd')
+  const [route, setRoute] = useState<'small' | 'large'>('small')
   const [playing, setPlaying] = useState(false)
-  const track = useRef<HTMLOListElement>(null)
   const selected = kind === 'comparison' ? mode : kind
   const stages = flows[selected]
-
-  useEffect(() => {
-    const current = track.current?.children[step] as HTMLElement | undefined
-    const container = track.current
-    if (current && container) container.scrollTo({
-      left: current.offsetLeft - container.offsetLeft - (container.clientWidth - current.clientWidth) / 2,
-      behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth',
-    })
-  }, [step, selected])
+  const path = selected === 'odd' ? route === 'small' ? smallPath : largePath : linearPaths[selected]
+  const position = path.indexOf(step)
+  const nextStep = () => { setPlaying(false); setStep(path[Math.min(position + 1, path.length - 1)]) }
+  const previousStep = () => { setPlaying(false); setStep(path[Math.max(position - 1, 0)]) }
 
   useEffect(() => {
     if (!playing) return
     const timer = window.setInterval(() => setStep(current => {
-      if (current === stages.length - 1) { setPlaying(false); return current }
-      return current + 1
+      const next = path[Math.min(path.indexOf(current) + 1, path.length - 1)]
+      if (next === path[path.length - 1]) setPlaying(false)
+      return next
     }), 1700)
     return () => window.clearInterval(timer)
-  }, [playing, stages])
+  }, [playing, path])
 
   return <div className="slide-diagram" aria-label={`Diagrama de ${selected}`}>
-    {kind === 'comparison' && <button className="diagram-mode" onClick={() => { setMode(current => current === 'odd' ? 'sdd' : 'odd'); setStep(0); setPlaying(false) }}>
-      Mostrar {mode === 'odd' ? 'SDD' : 'ODD'} (ahora: {mode.toUpperCase()})
-    </button>}
-    <ol className="diagram-track" ref={track} aria-label={`Etapas de ${selected.toUpperCase()}`}>
-      {stages.map((stage, i) => <li key={stage.name} className={i === step ? 'is-current' : i < step ? 'is-complete' : ''} aria-current={i === step ? 'step' : undefined}>
-        <span className="diagram-index">{String(i + 1).padStart(2, '0')}</span>{stage.name}
-      </li>)}
-    </ol>
+    {(kind === 'comparison' || selected === 'odd') && <div className="diagram-top-controls">
+      {kind === 'comparison' && <button className="diagram-mode" onClick={() => { setMode(current => current === 'odd' ? 'sdd' : 'odd'); setStep(0); setPlaying(false) }}>
+        Mostrar {mode === 'odd' ? 'SDD' : 'ODD'} (ahora: {mode.toUpperCase()})
+      </button>}
+      {selected === 'odd' && <button className="diagram-route" data-route={route === 'small' ? 'large' : 'small'} onClick={() => { setRoute(current => current === 'small' ? 'large' : 'small'); setStep(1); setPlaying(false) }}>
+        Mostrar ruta {route === 'small' ? 'grande' : 'pequeña'} (ahora: {route === 'small' ? 'pequeña' : 'grande'})
+      </button>}
+    </div>}
+    <DiagramScene selected={selected} stages={stages} step={step} path={path} onNext={nextStep} />
     <div className="diagram-readout" aria-live="polite">
       <strong>{stages[step].name}</strong>
       <p>{stages[step].detail}</p>
-      <span>Etapa {step + 1} de {stages.length} · Recorrido ilustrativo</span>
+      <span>{selected === 'odd' ? `Ruta ${route === 'small' ? 'pequeña' : 'grande'} · ` : ''}Etapa {position + 1} de {path.length} · Recorrido ilustrativo</span>
     </div>
     <div className="diagram-actions">
-      <button onClick={() => { setPlaying(false); setStep(i => Math.max(0, i - 1)) }} disabled={step === 0}>Paso anterior</button>
-      <button className="diagram-next" onClick={() => { setPlaying(false); setStep(i => Math.min(stages.length - 1, i + 1)) }} disabled={step === stages.length - 1}>Siguiente paso</button>
-      <button onClick={() => { setStep(0); setPlaying(true) }} aria-label="Reproducir recorrido desde el principio">Reproducir</button>
+      <button onClick={previousStep} disabled={position === 0}>Paso anterior</button>
+      <button className="diagram-next" onClick={nextStep} disabled={position === path.length - 1}>Siguiente paso</button>
+      <button onClick={() => { if (playing) setPlaying(false); else { setStep(0); setPlaying(true) } }} aria-label={playing ? 'Pausar recorrido' : 'Reproducir recorrido desde el principio'}>{playing ? 'Pausar' : 'Reproducir'}</button>
     </div>
   </div>
 }
